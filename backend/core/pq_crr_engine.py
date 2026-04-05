@@ -30,14 +30,13 @@ from __future__ import annotations
 
 import numpy as np
 from scipy.optimize import minimize
+from scipy.stats import skew
 def norm_cdf(x): return (1 + np.erf(x / np.sqrt(2))) / 2
 import pandas as pd
 from typing import Optional, Tuple, List, Dict
 import warnings
 
-# Suppress only expected numerical warnings from scipy/numpy optimisation
-# (e.g. division by zero in convergence checks). Do not suppress globally.
-warnings.filterwarnings("ignore", category=RuntimeWarning,
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
