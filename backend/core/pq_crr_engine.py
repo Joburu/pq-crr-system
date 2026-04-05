@@ -1,3 +1,4 @@
+"""
 pq_crr_engine.py
 ================
 (p,q)-Binomial Extension of the Cox-Ross-Rubinstein Model
@@ -5,7 +6,7 @@ for Life Insurance Portfolio Optimisation with Noisy Observations
 
 Author  : Based on Oburu, J.J. (2024) PhD thesis, JOOUST
 Corrected: (i) Removed phantom Reference [39]; (ii) Added the missing
-           analytical result: Noise Sensitivity Theorem - dw*/dp.
+           analytical result: Noise Sensitivity Theorem - ∂w*/∂p.
 
 Mathematical chain:
   Layer 1  - (p,q)-calculus primitives
@@ -29,13 +30,15 @@ from __future__ import annotations
 
 import numpy as np
 from scipy.optimize import minimize
-from scipy.stats import skew
-def norm_cdf(x): return (1 + np.erf(x / np.sqrt(2))) / 2
+from scipy.stats import norm, skew
 import pandas as pd
 from typing import Optional, Tuple, List, Dict
 import warnings
 
-warnings.filterwarnings("ignore", category=RuntimeWarning)
+# Suppress only expected numerical warnings from scipy/numpy optimisation
+# (e.g. division by zero in convergence checks). Do not suppress globally.
+warnings.filterwarnings("ignore", category=RuntimeWarning,
+                        module=r"scipy|numpy")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -269,7 +272,7 @@ class PQBinomialCRR:
         # Black-Scholes benchmark
         d1 = (np.log(S0 / K) + (r_free + 0.5 * sigma ** 2) * T) / (sigma * np.sqrt(T))
         d2 = d1 - sigma * np.sqrt(T)
-        bs  = S0 * norm_cdf(d1) - K * np.exp(-r_free * T) * norm_cdf(d2)
+        bs  = S0 * norm.cdf(d1) - K * np.exp(-r_free * T) * norm.cdf(d2)
 
         rows = []
         for N in n_steps_list:
@@ -594,7 +597,7 @@ class PortfolioOptimiser:
                 {"type": "ineq", "fun": lambda w: r_ceil  - float(w @ mu)},
             ]
 
-        bounds  = [(0.02, w_max)] * n
+        bounds  = [(0.02, w_max)] * n  # 2% min per asset forces diversification
         w0      = np.ones(n) / n
 
         result = minimize(
@@ -716,7 +719,7 @@ def calibrate_pq(
     lr      = np.diff(np.log(prices))
     mu_hat  = lr.mean()
     sig_hat = lr.std()
-    sk_hat  = float(np.mean(((lr - np.mean(lr))/np.std(lr))**3)) if len(lr) > 3 else 0.0
+    sk_hat  = float(skew(lr)) if len(lr) > 3 else 0.0
 
     # Normalise mean to (0,1) scale
     E_norm = np.clip(0.5 + mu_hat / (2.0 * sig_hat * np.sqrt(dt) + 1e-12),
