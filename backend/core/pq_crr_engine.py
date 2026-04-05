@@ -577,10 +577,13 @@ class PortfolioOptimiser:
         w_max = self.w_max
 
         def objective(w):
-            return float(w @ Sig @ w)
+            variance = float(w @ Sig @ w)
+            # Diversification penalty: penalise concentration
+            concentration = float(np.sum(w ** 2))
+            return variance + 0.01 * concentration
 
         def grad_objective(w):
-            return 2.0 * (Sig @ w)
+            return 2.0 * (Sig @ w) + 0.02 * w
 
         constraints = [
             {"type": "eq", "fun": lambda w: float(w @ mu)  - target_return},
