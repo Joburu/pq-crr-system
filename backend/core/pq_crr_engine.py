@@ -1,4 +1,36 @@
-"""
+"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+""
 pq_crr_engine.py
 ================
 (p,q)-Binomial Extension of the Cox-Ross-Rubinstein Model
@@ -595,7 +627,7 @@ class PortfolioOptimiser:
                 {"type": "ineq", "fun": lambda w: r_ceil  - float(w @ mu)},
             ]
 
-        bounds  = [(0.0, w_max)] * n
+        bounds  = [(0.02, w_max)] * n
         w0      = np.ones(n) / n
 
         result = minimize(
