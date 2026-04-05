@@ -11,3 +11,4 @@ python-dotenv==1.0.1
 psycopg2-binary==2.9.9
 aiofiles==24.1.0
 anthropic==0.34.2
+scipy==1.11.4 --only-binary=:all:

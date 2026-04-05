@@ -30,7 +30,7 @@ from __future__ import annotations
 
 import numpy as np
 from scipy.optimize import minimize
-from scipy.stats import norm, skew
+def norm_cdf(x): return (1 + np.erf(x / np.sqrt(2))) / 2
 import pandas as pd
 from typing import Optional, Tuple, List, Dict
 import warnings
@@ -38,7 +38,6 @@ import warnings
 # Suppress only expected numerical warnings from scipy/numpy optimisation
 # (e.g. division by zero in convergence checks). Do not suppress globally.
 warnings.filterwarnings("ignore", category=RuntimeWarning,
-                        module=r"scipy|numpy")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -272,7 +271,7 @@ class PQBinomialCRR:
         # Black-Scholes benchmark
         d1 = (np.log(S0 / K) + (r_free + 0.5 * sigma ** 2) * T) / (sigma * np.sqrt(T))
         d2 = d1 - sigma * np.sqrt(T)
-        bs  = S0 * norm.cdf(d1) - K * np.exp(-r_free * T) * norm.cdf(d2)
+        bs  = S0 * norm_cdf(d1) - K * np.exp(-r_free * T) * norm_cdf(d2)
 
         rows = []
         for N in n_steps_list:
@@ -719,7 +718,7 @@ def calibrate_pq(
     lr      = np.diff(np.log(prices))
     mu_hat  = lr.mean()
     sig_hat = lr.std()
-    sk_hat  = float(skew(lr)) if len(lr) > 3 else 0.0
+    sk_hat  = float(np.mean(((lr - np.mean(lr))/np.std(lr))**3)) if len(lr) > 3 else 0.0
 
     # Normalise mean to (0,1) scale
     E_norm = np.clip(0.5 + mu_hat / (2.0 * sig_hat * np.sqrt(dt) + 1e-12),
