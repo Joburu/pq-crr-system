@@ -5,6 +5,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 import numpy as np
+def norm_cdf(x): return (1 + np.erf(x / np.sqrt(2))) / 2
 
 from database import get_db
 from schemas import (OptimiseRequest, OptimiseResponse,
@@ -145,14 +146,14 @@ def get_convergence(
     Compute (p,q)-CRR convergence to Black-Scholes.
     Validates Theorems 4.1-4.2 numerically.
     """
-    from scipy.stats import norm
+    
     
     if q >= p - 0.02:
         raise HTTPException(422, "Requires q < p − 0.02")
 
     d1 = (np.log(S0/K) + (r + 0.5*sigma**2)*T) / (sigma*np.sqrt(T))
     d2 = d1 - sigma*np.sqrt(T)
-    bs = float(S0*norm.cdf(d1) - K*np.exp(-r*T)*norm.cdf(d2))
+    bs = float(S0*norm_cdf(d1) - K*np.exp(-r*T)*norm_cdf(d2))
 
     N_list = [25, 50, 75, 100, 200, 500, 1000, 5000]
     results = []
