@@ -5,15 +5,15 @@ for Life Insurance Portfolio Optimisation with Noisy Observations
 
 Author  : Based on Oburu, J.J. (2024) PhD thesis, JOOUST
 Corrected: (i) Removed phantom Reference [39]; (ii) Added the missing
-           analytical result: Noise Sensitivity Theorem — ∂w*/∂p.
+           analytical result: Noise Sensitivity Theorem - dw*/dp.
 
 Mathematical chain:
-  Layer 1  — (p,q)-calculus primitives
-  Layer 2  — Theorem 4.13 (core (p,q)-CRR operator, Eq. 4.2.8)
-  Layer 3  — Convergence to Black-Scholes (Thm 4.15, 4.18)
-  Layer 3* — *** NOISE SENSITIVITY THEOREM ∂w*/∂p [MISSING FROM THESIS] ***
-  Layer 4  — Portfolio optimisation with regulatory constraints
-  Layer 5  — Life insurance simulation (Section 4.5)
+  Layer 1  - (p,q)-calculus primitives
+  Layer 2  - Theorem 4.13 (core (p,q)-CRR operator, Eq. 4.2.8)
+  Layer 3  - Convergence to Black-Scholes (Thm 4.15, 4.18)
+  Layer 3* - *** NOISE SENSITIVITY THEOREM ∂w*/∂p [MISSING FROM THESIS] ***
+  Layer 4  - Portfolio optimisation with regulatory constraints
+  Layer 5  - Life insurance simulation (Section 4.5)
 
 References:
   Cox, Ross & Rubinstein (1979). Option pricing: a simplified approach.
@@ -39,7 +39,7 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# LAYER 1 — (p,q)-Calculus Primitives
+# LAYER 1 - (p,q)-Calculus Primitives
 # ─────────────────────────────────────────────────────────────────────────────
 
 class PQCalculus:
@@ -59,14 +59,14 @@ class PQCalculus:
 
     @staticmethod
     def integer(r: int, p: float, q: float) -> float:
-        """[r]_{p,q} — the (p,q)-integer."""
+        """[r]_{p,q} - the (p,q)-integer."""
         if abs(p - q) < 1e-12:
             return r * (p ** max(r - 1, 0))          # L'Hôpital limit
         return (p ** r - q ** r) / (p - q)
 
     @staticmethod
     def factorial(r: int, p: float, q: float) -> float:
-        """[r]_{p,q}! — the (p,q)-factorial."""
+        """[r]_{p,q}! - the (p,q)-factorial."""
         if r <= 0:
             return 1.0
         result = 1.0
@@ -76,7 +76,7 @@ class PQCalculus:
 
     @staticmethod
     def binomial_coeff(r: int, z: int, p: float, q: float) -> float:
-        """C(r,z)_{p,q} — the (p,q)-binomial (Gaussian) coefficient."""
+        """C(r,z)_{p,q} - the (p,q)-binomial (Gaussian) coefficient."""
         if z < 0 or z > r:
             return 0.0
         num = PQCalculus.factorial(r, p, q)
@@ -113,7 +113,7 @@ class PQCalculus:
 
     @staticmethod
     def d_integer_dq(r: int, p: float, q: float) -> float:
-        """∂[r]_{p,q} / ∂q — symmetric analogue."""
+        """∂[r]_{p,q} / ∂q - symmetric analogue."""
         if abs(p - q) < 1e-12:
             return -r * (r - 1) * (q ** max(r - 2, 0))
         numerator = -r * (q ** (r - 1)) * (p - q) + (p ** r - q ** r)
@@ -121,7 +121,7 @@ class PQCalculus:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# LAYER 2 — Theorem 4.13: Core (p,q)-CRR Operator
+# LAYER 2 - Theorem 4.13: Core (p,q)-CRR Operator
 # ─────────────────────────────────────────────────────────────────────────────
 
 class PQBinomialCRR:
@@ -163,8 +163,8 @@ class PQBinomialCRR:
 
         Parameters
         ----------
-        b_func : callable  — the function b evaluated at the coefficient
-        xi     : float     — endpoint price ratio  ξ = S_T / S_0
+        b_func : callable  - the function b evaluated at the coefficient
+        xi     : float     - endpoint price ratio  ξ = S_T / S_0
         """
         r, p, q = self.n_steps, self.p, self.q
         t_r = self._calc.t_normaliser(r, xi, p, q)
@@ -288,7 +288,7 @@ class PQBinomialCRR:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# LAYER 3* — THE MISSING THEOREM: Noise Sensitivity  ∂w*/∂p
+# LAYER 3* - THE MISSING THEOREM: Noise Sensitivity  ∂w*/∂p
 # ─────────────────────────────────────────────────────────────────────────────
 
 class NoiseSensitivity:
@@ -395,7 +395,7 @@ class NoiseSensitivity:
         lambda1: float = 1.0,
     ) -> np.ndarray:
         """
-        ∂w*/∂p — rate of change of optimal weights with respect to noise.
+        ∂w*/∂p - rate of change of optimal weights with respect to noise.
 
             ∂w*/∂p = Σ(p,q)⁻¹ [ λ₁ ∂μ/∂p  −  α_p w* ]
 
@@ -411,7 +411,7 @@ class NoiseSensitivity:
 
         Returns
         -------
-        dw_dp : (n,) — sensitivity of each weight to noise p
+        dw_dp : (n,) - sensitivity of each weight to noise p
         """
         try:
             Sigma_inv = np.linalg.inv(Sigma)
@@ -424,7 +424,7 @@ class NoiseSensitivity:
         rhs    = lambda1 * dmu_dp - self.alpha_p * w_star
         dw_dp  = Sigma_inv @ rhs
 
-        # Project onto {1^T v = 0} — preserve weight sum constraint
+        # Project onto {1^T v = 0} - preserve weight sum constraint
         n        = len(w_star)
         dw_dp   -= dw_dp.mean()
 
@@ -464,7 +464,7 @@ class NoiseSensitivity:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# LAYER 4 — Portfolio Optimiser
+# LAYER 4 - Portfolio Optimiser
 # ─────────────────────────────────────────────────────────────────────────────
 
 class PortfolioOptimiser:
@@ -585,7 +585,7 @@ class PortfolioOptimiser:
         ]
 
         if regulatory:
-            # IRA Kenya: solvency buffer — portfolio return must exceed
+            # IRA Kenya: solvency buffer - portfolio return must exceed
             # liabilities-adjusted floor
             r_floor = max(risk_free_rate, target_return * 0.80)
             r_ceil  = target_return * 1.60
@@ -679,15 +679,15 @@ def _summarise_sensitivity(dw_dp: np.ndarray, names: List[str]) -> str:
     idx_down = int(np.argmin(dw_dp))
     return (
         f"As observation noise increases (p↑): allocation to '{names[idx_up]}' "
-        f"rises (Δ≈{dw_dp[idx_up]:+.4f}/unit p) — noise-resilient asset. "
+        f"rises (Δ≈{dw_dp[idx_up]:+.4f}/unit p) - noise-resilient asset. "
         f"Allocation to '{names[idx_down]}' falls "
-        f"(Δ≈{dw_dp[idx_down]:+.4f}/unit p) — noise-sensitive asset. "
+        f"(Δ≈{dw_dp[idx_down]:+.4f}/unit p) - noise-sensitive asset. "
         f"This quantifies the regulatory capital buffer needed under noisy markets."
     )
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# LAYER 4b — Calibration from real data
+# LAYER 4b - Calibration from real data
 # ─────────────────────────────────────────────────────────────────────────────
 
 def calibrate_pq(
@@ -772,7 +772,7 @@ def calibrate_alpha_p(
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# LAYER 5 — Life Insurance Simulation (Section 4.5 corrected)
+# LAYER 5 - Life Insurance Simulation (Section 4.5 corrected)
 # ─────────────────────────────────────────────────────────────────────────────
 
 class LifeInsuranceSimulator:
@@ -856,7 +856,7 @@ class LifeInsuranceSimulator:
             #
             # Rationale: the insurer is solvent when its noisy observed value
             # exceeds the liability-adjusted floor. The (1 + p·σ) factor is
-            # derived from the Noise Sensitivity Theorem — it represents the
+            # derived from the Noise Sensitivity Theorem - it represents the
             # additional capital required to remain solvent despite observation
             # error of magnitude p·σ on a single-period liability measure.
             #
@@ -903,7 +903,7 @@ class LifeInsuranceSimulator:
 
 if __name__ == "__main__":
     print("=" * 70)
-    print(" (p,q)-Binomial CRR Engine — self-test")
+    print(" (p,q)-Binomial CRR Engine - self-test")
     print("=" * 70)
 
     # 1. Convergence test (Theorem 4.15)
@@ -942,7 +942,7 @@ if __name__ == "__main__":
                 print(f"  [WARN] {w.message}")
     print(f"\nCalibrated (p, q) from synthetic NSE data: p={p_cal:.4f}, q={q_cal:.4f}")
 
-    # 4. Direct xi_operator test — validates Theorem 4.13 / Eq. 4.2.8
+    # 4. Direct xi_operator test - validates Theorem 4.13 / Eq. 4.2.8
     #    b(x) = x (linear payoff) so Ξ^{p,q}_r(b, ξ) should equal
     #    the (p,q)-adjusted first moment, approximately p·ξ for small r.
     crr_op = PQBinomialCRR(p=0.75, q=0.55, n_steps=10)
