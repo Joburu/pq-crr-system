@@ -8,7 +8,7 @@ import { Card, CardTitle, MetricGrid, Metric, Slider, BarRow, Spinner, ErrorBox,
 import { useApi } from '../hooks/useApi.js'
 
 const COLORS = ['#1D9E75','#185FA5','#BA7517','#D85A30','#7C3AED']
-const ASSETS = ['TBills','NSE Equity','Govt Bonds','Corp Bonds','Real Estate']
+const ASSETS = ['TBills','NSE_Equity','GovtBonds','CorpBonds','RealEstate']
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
