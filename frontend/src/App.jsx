@@ -5,6 +5,7 @@ import Calibration from './pages/Calibration.jsx'
 import Simulation  from './pages/Simulation.jsx'
 import Reports     from './pages/Reports.jsx'
 import Convergence from './pages/Convergence.jsx'
+import StressTest  from './pages/StressTest.jsx'
 
 const NAV = [
   { to: '/',            label: 'Portfolio',    icon: '◈' },
@@ -12,6 +13,7 @@ const NAV = [
   { to: '/simulation',  label: 'Simulation',   icon: '▶' },
   { to: '/convergence', label: 'Convergence',  icon: '∿' },
   { to: '/reports',     label: 'Reports',      icon: '☰' },
+  { to: '/stress',      label: 'Stress Test',  icon: '⚡' },
 ]
 
 function Sidebar() {
@@ -91,6 +93,7 @@ export default function App() {
               <Route path="/calibration" element={<Calibration />} />
               <Route path="/simulation"  element={<Simulation />} />
               <Route path="/convergence" element={<Convergence />} />
+              <Route path='/stress'      element={<StressTest />} />
               <Route path="/reports"     element={<Reports />} />
             </Routes>
           </main>
