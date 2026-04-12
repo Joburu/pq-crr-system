@@ -123,7 +123,7 @@ export default function StressTest() {
       </Card>
 
       {loading && <Spinner />}
-      {error && <ErrorBox message={error} />}
+      {error && <ErrorBox msg={error} />}
 
       {!loading && !error && (
         <>
